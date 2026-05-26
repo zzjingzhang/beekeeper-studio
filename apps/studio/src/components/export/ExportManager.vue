@@ -12,7 +12,7 @@
     <ExportNotification
       v-for="e in exports"
       :key="e.id"
-      :export-id="e.id"
+      :exportId="e.id"
     />
   </div>
 </template>

@@ -9,12 +9,8 @@
       </template>
     </div>
     <div v-else-if="!snapshot" class="alert">
-      <div class="alert-body">
-        Plugin "{{ pluginId }}" is not installed.
-      </div>
-      <button class="btn btn-flat" @click="reloadComponent">
-        Reload
-      </button>
+      <div class="alert-body">Plugin "{{ pluginId }}" is not installed.</div>
+      <button class="btn btn-flat" @click="reloadComponent">Reload</button>
     </div>
     <div v-else-if="!snapshot.loadable" class="plugin-status">
       <p>
@@ -31,20 +27,17 @@
           Or install an older plugin version manually (see
           <a
             href="https://docs.beekeeperstudio.io/user_guide/plugins/#installing-a-specific-plugin-version"
-          >instructions</a>).
+            >instructions</a
+          >).
         </li>
       </ol>
     </div>
     <div v-else-if="error" class="alert alert-danger">
       <i class="material-icons-outlined">error</i>
-      <div class="alert-body">
-        {{ error }}
-      </div>
-      <button class="btn btn-flat" @click="reloadComponent">
-        Reload
-      </button>
+      <div class="alert-body">{{ error }}</div>
+      <button class="btn btn-flat" @click="reloadComponent">Reload</button>
     </div>
-    <DisableStateAlert v-else :plugin-id="pluginId" />
+    <DisableStateAlert v-else :pluginId="pluginId" />
     <div class="iframe-container" ref="container" />
   </div>
 </template>

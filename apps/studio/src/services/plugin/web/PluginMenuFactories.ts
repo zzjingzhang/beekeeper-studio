@@ -67,7 +67,6 @@ function buildParamsForTableMenu(
             .getColumns()
             .find((column) => column === component._column);
         }
-        return undefined;
       }) || ranges[0];
   }
 

@@ -1,5 +1,5 @@
 import { Compartment, EditorState } from "@codemirror/state";
-import { EditorView, drawSelection } from "@codemirror/view";
+import { EditorView } from "@codemirror/view";
 
 const readOnlyCompartment = new Compartment();
 
@@ -8,12 +8,7 @@ export interface ReadOnlyConfiguration {
 }
 
 export function readOnly(config: ReadOnlyConfiguration = { enabled: false }) {
-  return [
-    readOnlyCompartment.of([
-      drawSelection({ cursorBlinkRate: config.enabled ? 0 : undefined }),
-      EditorState.readOnly.of(config.enabled),
-    ]),
-  ];
+  return readOnlyCompartment.of(EditorState.readOnly.of(config.enabled));
 }
 
 /**

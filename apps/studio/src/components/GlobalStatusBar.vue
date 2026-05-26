@@ -9,7 +9,7 @@
     >
       <connection-button />
     </div>
-    <portal-target name="global-status-bar" />
+    <portal-target name="global-status-bar"></portal-target>
   </div>
 </template>
 

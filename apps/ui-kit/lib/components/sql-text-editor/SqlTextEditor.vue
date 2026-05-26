@@ -12,7 +12,7 @@ import {
   InternalContextItem,
   divider,
 } from "../context-menu";
-import { format, formatDialect } from "sql-formatter";
+import { format } from "sql-formatter";
 import ProxyEmit from "../mixins/ProxyEmit";
 import Vue from "vue";
 import { TextEditorMenuContext } from "../text-editor";
@@ -130,24 +130,10 @@ export default Vue.extend({
     formatSql() {
       if(this.value == null || this.value.trim() === '') return
 
-      let formatted: string;
-      try {
-        if (this.formatterDialectOptions) {
-          formatted = formatDialect(this.value, {
-            dialect: this.formatterDialectOptions,
-            ...this.formatterConfig
-          });
-        } else {
-          formatted = format(this.value, {
-            language: this.formatterDialect,
-            ...this.formatterConfig
-          });
-        }
-      } catch (_e) {
-        // Fall back silently — a parse error in the formatter shouldn't
-        // clobber what the user typed.
-        formatted = this.value;
-      }
+      const formatted = format(this.value, {
+        language: this.formatterDialect,
+        ...this.formatterConfig
+      });
       this.$emit("bks-value-change", { value: formatted });
     },
   },

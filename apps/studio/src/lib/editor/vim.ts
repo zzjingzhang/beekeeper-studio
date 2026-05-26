@@ -20,10 +20,15 @@ export function applyConfig(codeMirrorVimInstance: any, config: Config) {
   }
 }
 
-async function readVimrc(): Promise<string[]> {
-  const data: string | null = await Vue.prototype.$util.send('config/readVimrc');
-  if (data == null) return [];
-  return data.split("\n");
+async function readVimrc(pathToVimrc?: string): Promise<string[]> {
+  const userDirectory = window.platformInfo.userDirectory;
+  const vimrcPath = await Vue.prototype.$util.send('file/pathJoin', { paths: [pathToVimrc ?? userDirectory, ".beekeeper.vimrc"]});
+  if (await Vue.prototype.$util.send('file/exists', { path: vimrcPath })) {
+    const data = await Vue.prototype.$util.send('file/read', { path: vimrcPath, options: { encoding: 'utf-8', flag: 'r'}});
+    const dataSplit = data.split("\n");
+    return dataSplit;
+  }
+  return [];
 }
 
 export async function getVimKeymapsFromVimrc(): Promise<IMapping[]> {

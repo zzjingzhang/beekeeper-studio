@@ -17,7 +17,7 @@
         :is-focused="focusingElement === 'text-editor'"
         :auto-focus="true"
         :extensions="extensions"
-        :prompt-symbol="promptSymbol"
+        :promptSymbol="promptSymbol"
         :line-wrapping="wrapText"
         @clear="clear"
         @submitCommand="submitMongoCommand"
@@ -26,8 +26,8 @@
         @bks-shell-run-command="submitMongoCommand"
       />
       <!-- This is we so we have the separating line -->
-      <span class="expand" />
-      <div class="toolbar text-right" />
+      <span class="expand"></span>
+      <div class="toolbar text-right"></div>
     </div>
     <div class="not-supported" v-if="!enabled">
       <span class="title">
@@ -42,7 +42,7 @@
       ref="bottomPanel"
     >
       <progress-bar
-        :can-cancel="false"
+        :canCancel="false"
         :message="runningText"
         v-if="running"
       />
@@ -83,13 +83,13 @@
         class="layout-center expand"
         v-else
       >
-        <shortcut-hints :is-mongo="true" />
+        <shortcut-hints :isMongo="true" />
       </div>
       <!-- <span class="expand" v-if="!result"></span> -->
       <!-- STATUS BAR -->
       <query-editor-status-bar
         v-model="selectedResult"
-        :hide-wrap-text="true"
+        :hideWrapText="true"
         :results="results"
         :running="running"
         @download="download"

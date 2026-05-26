@@ -28,7 +28,7 @@
           :hide-toggle="true"
           :expanded="!isAutodetect"
         >
-          <template #header>
+          <template v-slot:header>
             <x-switch
               @click.prevent="isAutodetect = !isAutodetect"
               :toggled="isAutodetect"

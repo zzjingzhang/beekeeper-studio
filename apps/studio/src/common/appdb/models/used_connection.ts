@@ -45,7 +45,6 @@ export class UsedConnection extends DbConnectionBase implements ISimpleConnectio
       this.libsqlOptions = other.libsqlOptions
       this.sqlAnywhereOptions = other.sqlAnywhereOptions
       this.surrealDbOptions = other.surrealDbOptions
-      this.dynamoDbOptions = other.dynamoDbOptions
 
     }
 

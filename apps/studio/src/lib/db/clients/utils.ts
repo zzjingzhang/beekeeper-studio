@@ -476,7 +476,7 @@ export async function getAWSCLIToken(server: IDbConnectionServerConfig, options:
   }
 
   return new Promise<string>((resolve, reject) => {
-    const proc = spawn(options.cliPath, [
+    const proc = spawn(sanitizeCommandPath(options.cliPath), [
       'rds',
       'generate-db-auth-token',
       '--hostname',
@@ -488,7 +488,7 @@ export async function getAWSCLIToken(server: IDbConnectionServerConfig, options:
       '--username',
       server.user,
       ...extraArgs
-    ], { shell: false });
+    ], { shell: true });
 
     let stdout = '';
     let stderr = '';

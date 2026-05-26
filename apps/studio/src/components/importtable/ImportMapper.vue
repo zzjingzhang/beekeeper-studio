@@ -415,9 +415,9 @@ export default {
         const duplicates = tableData.filter(t => {
           if (tableDataSet.has(t)) {
             tableDataSet.delete(t)
-            return false
+          } else {
+            return t
           }
-          return true
         })
 
         this.$noty.error(`The following table columns can only be mapped to one header: ${duplicates.join(', ')}`)

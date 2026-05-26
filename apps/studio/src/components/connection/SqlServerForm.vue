@@ -4,11 +4,8 @@
       <label for="authenticationType">Authentication Method</label>
       <!-- need to take the value -->
       <select name="" v-model="authType" id="">
-        <option value="default">
-          Username / Password
-        </option>
-        <option :key="`${t.value}-${t.name}`" v-for="t in authTypes" :value="t.value">
-          {{ t.name }}
+        <option value="default">Username / Password</option>
+        <option :key="`${t.value}-${t.name}`" v-for="t in authTypes" :value="t.value">{{t.name}}
         </option>
       </select>
     </div>
@@ -88,7 +85,7 @@
           this.config.azureAuthOptions.azureAuthType = undefined
         } else {
           if (this.$store.getters.isCommunity) {
-            this.$root.$emit(AppEvent.upgradeModal, "Enterprise Authentication");
+            this.$root.$emit(AppEvent.upgradeModal, "Upgrade required to use this authentication type");
             this.authType = 'default'
           } else {
             this.azureAuthEnabled = true

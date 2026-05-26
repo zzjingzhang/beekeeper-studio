@@ -39,7 +39,6 @@
         :is-focused="focusingElement === 'text-editor'"
         :markers="editorMarkers"
         :formatter-dialect="formatterDialect"
-        :formatter-dialect-options="formatterDialectOptions"
         :identifier-dialect="identifierDialect"
         :param-types="paramTypes"
         :keybindings="keybindings"
@@ -162,6 +161,7 @@
               <x-label>Rollback</x-label>
             </x-button>
           </x-buttons>
+
         </div>
 
         <div class="editor-help expand" />
@@ -268,15 +268,15 @@
       <result-table
         ref="table"
         v-else-if="showResultTable"
-        :edit-data="resultEditData"
-        :editing-data="editingResult"
+        :editData="resultEditData"
+        :editingData="editingResult"
         :focus="focusingElement === 'table'"
         :active="active"
         :table-height="tableHeight"
         :result="result"
         :query="query"
         :tab="tab"
-        :is-manual-commit="isManualCommit"
+        :isManualCommit="isManualCommit"
         :binary-encoding="$bksConfig.ui.general.binaryEncoding"
       />
       <div
@@ -312,13 +312,12 @@
       <!-- <span class="expand" v-if="!result"></span> -->
       <!-- STATUS BAR -->
       <query-editor-status-bar
-        v-if="!editHistoryOpen"
         v-model="selectedResult"
         :results="results"
         :running="running"
         :editing="editingResult"
-        :changes-count="$refs.table?.pendingChangesCount"
-        :changes-string="$refs.table?.pendingChangesString"
+        :changesCount="$refs.table?.pendingChangesCount"
+        :changesString="$refs.table?.pendingChangesString"
         :result-editable="resultEditable"
         @editResults="editResults"
         @stopEditing="stopEditing"
@@ -337,14 +336,6 @@
       />
     </div>
 
-    <query-edit-history
-      :open="editHistoryOpen"
-      :query-id="query?.id ?? null"
-      :unsaved-text="unsavedChanges ? unsavedText : null"
-      @close="editHistoryOpen = false"
-      @restore="handleEditHistoryRestore"
-    />
-
     <!-- Super-Formatter Modal -->
     <portal to="modals">
       <modal
@@ -362,7 +353,6 @@
           <bks-super-formatter
             :value="unsavedText"
             :formatter-dialect="formatterDialect"
-            :formatter-dialect-options="formatterDialectOptions"
             :identifier-dialect="identifierDialect"
             :can-add-presets="true"
             :clipboard="$native.clipboard"
@@ -428,12 +418,8 @@
               <div class="form-group" v-if="queryFolders && queryFolders.length > 0">
                 <label>Folder <i v-if="!isUltimate && !isCloud" class="material-icons menu-icon">stars</i></label>
                 <select v-model="query.queryFolderId" :disabled="!isUltimate && !isCloud">
-                  <option :value="null">
-                    No folder
-                  </option>
-                  <option v-for="f in queryFolders" :key="f.id" :value="f.id">
-                    {{ f.name }}
-                  </option>
+                  <option :value="null">No folder</option>
+                  <option v-for="f in queryFolders" :key="f.id" :value="f.id">{{ f.name }}</option>
                 </select>
               </div>
             </div>
@@ -536,10 +522,9 @@
   import SqlTextEditor from "@beekeeperstudio/ui-kit/vue/sql-text-editor"
   import BksSuperFormatter from "@beekeeperstudio/ui-kit/vue/super-formatter"
   import SurrealTextEditor from "@beekeeperstudio/ui-kit/vue/surreal-text-editor"
-  import { divider, type Entity } from "@beekeeperstudio/ui-kit";
+  import type { Entity } from "@beekeeperstudio/ui-kit";
 
   import QueryEditorStatusBar from './editor/QueryEditorStatusBar.vue'
-  import QueryEditHistory from '@/components/editor/QueryEditHistory.vue'
   import rawlog from '@bksLogger'
   import ErrorAlert from './common/ErrorAlert.vue'
   import MergeManager from '@/components/editor/MergeManager.vue'
@@ -548,7 +533,7 @@
   import { TransportOpenTab, findQuery } from '@/common/transport/TransportOpenTab'
   import { blankFavoriteQuery } from '@/common/transport'
   import { FieldEditData, TableOrView } from "@/lib/db/models";
-  import { FormatterDialect, dialectFor, formatOptionsFor } from "@shared/lib/dialects/models"
+  import { FormatterDialect, dialectFor } from "@shared/lib/dialects/models"
   import { findSqlQueryIdentifierDialect } from "@/lib/editor/CodeMirrorPlugins";
   import { queryMagicExtension } from "@/lib/editor/extensions/queryMagicExtension";
   import { getVimKeymapsFromVimrc } from "@/lib/editor/vim";
@@ -565,7 +550,7 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
 
   export default {
     // this.queryText holds the current editor value, always
-    components: { ResultTable, ProgressBar, ShortcutHints, QueryEditorStatusBar, ErrorAlert, MergeManager, SqlTextEditor, SurrealTextEditor, BksSuperFormatter, QueryEditHistory },
+    components: { ResultTable, ProgressBar, ShortcutHints, QueryEditorStatusBar, ErrorAlert, MergeManager, SqlTextEditor, SurrealTextEditor, BksSuperFormatter},
     props: {
       tab: Object as PropType<TransportOpenTab>,
       active: Boolean
@@ -610,7 +595,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
         vimKeymaps: [],
         formatterPresets: [],
         selectedFormatter: null,
-        editHistoryOpen: false,
         /**
          * NOTE: Use focusElement instead of focusingElement or blurTextEditor()
          * if we want to switch focus. Why two states? We need a feedback from
@@ -655,11 +639,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
       ...mapState('settings', ['settings']),
       ...mapState('tabs', { 'activeTab': 'active' }),
       ...mapGetters('popupMenu', ['getExtraPopupMenu']),
-      rootBindings() {
-        return [
-          { event: AppEvent.openQueryEditHistory, handler: this.handleOpenQueryEditHistory },
-        ];
-      },
       readOnly() {
         if (this.remoteDeleted) {
           return true;
@@ -829,13 +808,8 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
           if (_.isEmpty(placeholders)) {
             return query;
           }
-          // For positional (?) params pass an ordered array; for named params pass the
-          // full record keyed by placeholder so the mapping is stable regardless of how
-          // many times each name appears in the query.
-          const rawValues = placeholders.includes('?')
-            ? Object.values(this.queryParameterValues) as string[]
-            : this.queryParameterValues as Record<string, string>;
-          const convertedParams = convertParamsForReplacement(placeholders, rawValues);
+          const values = Object.values(this.queryParameterValues) as string[];
+          const convertedParams = convertParamsForReplacement(placeholders, values);
           query = deparameterizeQuery(query, this.dialect, convertedParams, this.paramTypes);
         } catch (ex) {
           log.error("Unable to deparameterize query", ex)
@@ -903,13 +877,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
       },
       formatterDialect() {
         return FormatterDialect(dialectFor(this.queryDialect))
-      },
-      formatterDialectOptions() {
-        // Only populated for dialects sql-formatter doesn't ship natively
-        // (currently just DynamoDB PartiQL). When null, the formatter falls
-        // back to the string `formatterDialect` prop above.
-        const opts = formatOptionsFor(dialectFor(this.queryDialect))
-        return 'dialect' in opts ? opts.dialect : null
       },
       paramTypes() {
         // TODO: Parameter replacement for redis
@@ -1267,7 +1234,7 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
       },
       async editResults() {
         if (this.isCommunity) {
-          this.$root.$emit(AppEvent.upgradeModal, "Editable Query Results")
+          this.$root.$emit(AppEvent.upgradeModal, "Upgrade required to edit query result data")
           return;
         }
         if (!this.resultsEditData[this.selectedResult]) {
@@ -1418,7 +1385,7 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
       },
       async submitQueryToFile() {
         if (this.isCommunity) {
-          this.$root.$emit(AppEvent.upgradeModal, 'Query to File')
+          this.$root.$emit(AppEvent.upgradeModal)
           return;
         }
 
@@ -1432,7 +1399,7 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
       },
       async submitCurrentQueryToFile() {
         if (this.isCommunity) {
-          this.$root.$emit(AppEvent.upgradeModal, 'Query to File')
+          this.$root.$emit(AppEvent.upgradeModal)
           return;
         }
         if (this.runButtonDisabled) return;
@@ -1818,18 +1785,8 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
           {
             label: "Open Query Formatter",
             id: "formatter",
-            handler: this.formatterPreset,
+            handler: this.formatterPreset
           },
-          ...(this.query?.id && this.isCloud
-            ? [
-                divider,
-                {
-                  label: "View Edit History",
-                  id: "view-edit-history",
-                  handler: this.viewEditHistory,
-                },
-              ]
-            : []),
           ...(window.platformInfo.isDevelopment && this.isCloud && this.query?.id
             ? [
                 { type: "divider" },
@@ -1842,23 +1799,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
             : []),
           ...this.getExtraPopupMenu("editor.query", { transform: "ui-kit" }),
         ];
-      },
-      viewEditHistory() {
-        if (!this.query?.id) {
-          return;
-        }
-        this.editHistoryOpen = true;
-      },
-      handleOpenQueryEditHistory(savedQueryId) {
-        if (this.tab.queryId === savedQueryId) {
-          this.editHistoryOpen = true;
-        }
-      },
-      handleEditHistoryRestore(restored) {
-        this.fullQuery = restored;
-        this.unsavedText = restored.text;
-        this.originalText = restored.text;
-        this.editHistoryOpen = false;
       },
       getCommitModeVTooltip(options: {
         title: string;
@@ -1906,9 +1846,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
         };
       }
     },
-    created() {
-      this.registerHandlers(this.rootBindings)
-    },
     async mounted() {
       const {
         primaryFunc,
@@ -1953,7 +1890,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
       this.addTransactionTimeoutListener();
     },
     beforeDestroy() {
-      this.unregisterHandlers(this.rootBindings)
       if(this.split) {
         this.split.destroy()
       }
@@ -1967,17 +1903,6 @@ import { KeybindingPath } from '@/common/bksConfig/BksConfigProvider'
 <style lang="scss" scoped>
   @use "sass:color";
   @import '../assets/styles/app/_variables';
-
-  .query-editor {
-    position: relative;
-
-    & ::v-deep .query-edit-history {
-      position: absolute;
-      inset: 0;
-      // must do this to win over the split.js gutter
-      z-index: 21;
-    }
-  }
 
   label[for="commit-mode"] {
     color: var(--text);

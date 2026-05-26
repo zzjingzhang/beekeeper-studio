@@ -352,10 +352,6 @@ export abstract class BasicDatabaseClient<RawResultType extends BaseQueryResult,
 
   async alterTable(change: AlterTableSpec): Promise<void> {
     const sql = await this.alterTableSql(change)
-    if (!sql) {
-      // No SQL generated (e.g., no changes or schemaless database)
-      return
-    }
     await this.executeQuery(sql)
   }
 
@@ -809,7 +805,7 @@ export abstract class BasicDatabaseClient<RawResultType extends BaseQueryResult,
       const pks = await this.getPrimaryKeys(table.name, table.schema);
       const columns = await this.listTableColumns(table.name, table.schema);
       let isEditable = false;
-      if (pks?.length) {
+      if (!!pks?.length) {
         const hasTableWildcard = wildcards.some((w) => this.matchesTable(w, table));
         if (hasTopLevelWildcard || hasTableWildcard) {
           isEditable = true;

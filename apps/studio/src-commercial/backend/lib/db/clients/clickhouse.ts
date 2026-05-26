@@ -502,7 +502,7 @@ export class ClickHouseClient extends BasicDatabaseClient<Result> {
 
   private async updateValues(updates: TableUpdate[]) {
     log.info("Applying updates", updates);
-    const results: TableUpdateResult[] = [];
+    let results: TableUpdateResult[] = [];
 
     const updateQueries = buildUpdateQueries(this.knex, updates);
     for (const query of updateQueries) {
@@ -687,7 +687,7 @@ export class ClickHouseClient extends BasicDatabaseClient<Result> {
   }
 
   async query(queryText: string): Promise<CancelableQuery> {
-    const queryId = uuidv4();
+    let queryId = uuidv4();
     const cancelable = createCancelablePromise(errors.CANCELED_BY_USER);
     return {
       execute: async (): Promise<NgQueryResult[]> => {
@@ -1071,7 +1071,7 @@ export class ClickHouseClient extends BasicDatabaseClient<Result> {
   static buildFilterString(filters: TableFilter[], columns = []) {
     let fullFilterString = "";
     let filterString = "";
-    const filterParams = {};
+    let filterParams = {};
     let paramCounter = 0;
 
     if (filters && _.isArray(filters) && filters.length > 0) {

@@ -62,7 +62,9 @@ export const TabModule: Module<State, RootState> = {
       return state.tabs.map((tab) => {
         const query = tab.queryId ? rootState['data/queries']['items'].find((q) => q.id === tab.queryId) : null
         const table = tab.tableName ? rootState.tables.find((t) => {
-          return t.name === tab.tableName && t.schema === tab.schemaName
+          t.name === tab.tableName && (
+            t.schema === tab.schemaName
+          )
         }) : null
         return {
           tab,

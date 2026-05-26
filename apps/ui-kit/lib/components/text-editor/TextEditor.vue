@@ -1,5 +1,5 @@
 <template>
-  <div class="BksUiKit BksTextEditor" ref="editor" v-bind="$attrs" />
+  <div class="BksUiKit BksTextEditor" ref="editor" />
 </template>
 
 <script lang="ts">

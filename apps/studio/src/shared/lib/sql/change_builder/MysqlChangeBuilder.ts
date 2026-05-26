@@ -114,7 +114,7 @@ export class MySqlChangeBuilder extends ChangeBuilderBase {
     if (existing.generated && existing.generationExpression) {
       const isStored = /STORED GENERATED/gi.test(extra);
       // MySQL stores generation expressions with escaped quotes, we need to unescape them
-      const unescapedExpression = existing.generationExpression.replace(/\\'/g, "'");
+      let unescapedExpression = existing.generationExpression.replace(/\\'/g, "'");
 
       generationExpression = `GENERATED ALWAYS AS (${unescapedExpression}) ${isStored ? 'STORED' : 'VIRTUAL'}`;
       extra = null;

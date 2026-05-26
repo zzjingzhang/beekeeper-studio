@@ -52,7 +52,7 @@
           :expanded="true"
           class="schema-toggle-item"
         >
-          <template #default>
+          <template v-slot:default>
             <div class="import-table-form">
               <!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
               <div v-for="(tableData, tIndex) in schemaTable.tables" :key="tIndex" v-if="tableData.entityType === 'table'">

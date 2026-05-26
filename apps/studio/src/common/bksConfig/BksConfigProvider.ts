@@ -189,7 +189,6 @@ export function convertKeybinding(
     case "tabulator":
       modifierMap = tabulatorModifierMap;
       joinChar = ' + ';
-      break;
     case "ui":
       modifierMap = uiModifierMap;
       break;

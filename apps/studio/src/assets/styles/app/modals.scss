@@ -14,47 +14,55 @@
   }
 
   &.upgrade-modal {
-    .v--modal {
-      overflow: hidden;
-      border-radius: 12px;
-      max-height: calc(100vh - 40px);
+    .dialog-content {
+      padding: 2rem 2rem 1rem;
     }
-    .v--modal-box {
-      display: flex;
-      flex-direction: column;
+    .dialog-c-title {
+      font-size: 1.2em;
     }
-    .dialog-content.upgrade-modal-content {
-      padding: 0;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0;
+    .checkbox-wrapper {
+      margin-left: auto;
+      margin-right: auto;
+      ul.check-list {
+        padding-left: 0;
+        li {
+          padding-bottom: 10px;
+          &:before {
+            font-family: "Material Icons";
+            content: "\e5ca";
+            margin-right: 0.5rem;
+            margin-bottom: -10px;
+            color: $brand-success;
+          }
+          list-style: none;
+        }
+      }
+      > p {
+        margin-bottom: 0;
+      }
     }
-    .upgrade-panel {
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0;
+    .check-list {
+      margin-bottom: 0;
     }
-    .upgrade-panel-scroll {
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow-y: auto;
-    }
-    .upgrade-panel-header {
-      padding-right: 32px; // room for close button
+    .vue-dialog-buttons {
+      justify-content: stretch;
+      padding-left: 0;
+      padding-right: 0;
+      padding-top: 1rem;
+      & > div {
+        width: 100%;
+      }
+      .actions {
+        justify-content: flex-end;
+      }
     }
     .close-btn {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      z-index: 2;
-      color: $text-light;
+      top: 1.5rem;
+      right: 1.5rem;
     }
   }
 
-  &.sql-files-import-modal, &.wait-sso-modal {
+  &.confirmation-modal, &.sql-files-import-modal, &.wait-sso-modal {
     .v--modal {
       width: auto !important;
       min-height: 0px;

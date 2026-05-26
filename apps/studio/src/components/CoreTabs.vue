@@ -85,7 +85,7 @@
           :tab="tab"
           :tab-id="tab.id"
           @update-tab="updateTab"
-        />
+         />
         <Shell
           v-if="tab.tabType === 'shell'"
           :active="activeTab?.id === tab.id"
@@ -109,7 +109,7 @@
           :tab="tab"
           @close="close"
         >
-          <template #default="slotProps">
+          <template v-slot:default="slotProps">
             <TableTable
               :tab="tab"
               :active="activeTab?.id === tab.id"
@@ -122,7 +122,7 @@
           :tab="tab"
           @close="close"
         >
-          <template #default="slotProps">
+          <template v-slot:default="slotProps">
             <TableProperties
               :active="activeTab?.id === tab.id"
               :tab="tab"
@@ -271,7 +271,7 @@
     </portal>
 
     <confirmation-modal :id="confirmModalId">
-      <template #title>
+      <template v-slot:title>
         Really close
         <span
           class="tab-like"
@@ -281,7 +281,7 @@
         </span>
         ?
       </template>
-      <template #message>
+      <template v-slot:message>
         You will lose unsaved changes
       </template>
     </confirmation-modal>
@@ -784,10 +784,6 @@ export default Vue.extend({
         this.$noty.error("You can only import data into a table")
         return;
       }
-      if (this.$store.getters.isCommunity) {
-        this.$root.$emit(AppEvent.upgradeModal, 'Import From File')
-        return;
-      }
       const t = { tabType: 'import-table' }
       t.title = table ? `Import Table: ${table.name}` : 'Create Table and Import Data'
       t.unsavedChanges = false
@@ -828,8 +824,8 @@ export default Vue.extend({
         error: false,
       }))
 
-      if (!files.every(({ file }) => /\.(sql|txt)$/i.test(file.name))) {
-        this.$noty.error('Only .sql and .txt files are supported')
+      if (!files.every(({ file }) => file.name.endsWith('.sql'))) {
+        this.$noty.error('Only .sql files are supported')
         return
       }
 
@@ -936,7 +932,7 @@ export default Vue.extend({
         try {
           // TODO (azmi): this process can take longer by accident. Consider
           // an ability to cancel reading file.
-          const text = await this.$util.send('file/readSqlFile', { path: file.path })
+          const text = await this.$util.send('file/read', { path: file.path, options: { encoding: 'utf8', flag: 'r' }})
           if (text) {
             const query = await this.$util.send('appdb/query/new');
             query.title = file.name
@@ -964,21 +960,23 @@ export default Vue.extend({
 
       const lastExportPath = await Vue.prototype.$settings.get("lastExportPath", await window.main.defaultExportPath(fileName));
 
+      const filePath = this.$native.dialog.showSaveDialogSync({
+        title: "Export Query",
+        defaultPath: lastExportPath,
+        filters: [
+          { name: 'SQL (*.sql)', extensions: ['sql'] },
+          { name: 'All Files (*.*)', extensions: ['*'] },
+        ],
+      })
+
+      // do nothing if canceled
+      if (!filePath) return
+
       const notyQueue = 'export-query'
       this.$noty.info('Exporting query',  { queue: notyQueue })
 
       try {
-        const saved = await window.main.fileHelpers.save({
-          fileName: lastExportPath,
-          content: query.text,
-          filters: [
-            { name: 'SQL (*.sql)', extensions: ['sql'] },
-            { name: 'All Files (*.*)', extensions: ['*'] },
-          ],
-        })
-        if (saved === false) {
-          return
-        }
+        await this.$util.send('file/write', { path: filePath, text: query.text, options: { encoding: 'utf8' }})
         this.$noty.success('Query exported!', { killer: notyQueue })
       } catch (e) {
         console.error(e)
@@ -1160,7 +1158,7 @@ export default Vue.extend({
       }
       this.addTab(tab)
     },
-    async favoriteClick(item, options?: { openHistory?: boolean }) {
+    favoriteClick(item) {
       const tab = {} as TransportOpenTab
       tab.tabType = 'query'
       tab.title = item.title
@@ -1168,16 +1166,10 @@ export default Vue.extend({
       tab.unsavedChanges = false
 
       const existing = this.tabItems.find((t) => matches(t, tab))
-      if (existing) {
-        await this.$store.dispatch('tabs/setActive', existing)
-      } else {
-        await this.addTab(tab)
-      }
+      if (existing) return this.$store.dispatch('tabs/setActive', existing)
 
-      if (options.openHistory) {
-        await this.$nextTick()
-        this.trigger(AppEvent.openQueryEditHistory, item.id)
-      }
+      this.addTab(tab)
+
     },
     async createQueryFromItem(item) {
       const tab = {} as TransportOpenTab;

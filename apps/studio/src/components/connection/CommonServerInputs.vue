@@ -68,7 +68,7 @@
     <common-ssl
       :config="config"
       :ssl-help="sslHelp"
-      :support-complex-s-s-l="supportComplexSSL"
+      :supportComplexSSL="supportComplexSSL"
     />
 
     <div class="row gutter">

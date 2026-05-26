@@ -212,14 +212,13 @@ export default class WebPluginLoader {
             version: this.context.appVersion,
           };
           break;
-        case "getViewContext": {
+        case "getViewContext":
           const view = this.viewInstances.find((ins) => ins.iframe === source);
           if (!view) {
             throw new Error("View context not found.");
           }
           response.result = view.context;
           break;
-        }
         case "getConnectionInfo":
           response.result = this.pluginStore.getConnectionInfo();
           break;
@@ -406,7 +405,7 @@ export default class WebPluginLoader {
   }
 
   postMessage(iframe: HTMLIFrameElement, data: PluginNotificationData | ResponsePayload) {
-    iframe.contentWindow.postMessage(data, `plugin://${this.manifest.id}`);
+    iframe.contentWindow.postMessage(data, "*");
   }
 
   broadcast(data: PluginNotificationData) {

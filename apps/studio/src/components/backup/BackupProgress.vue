@@ -42,10 +42,24 @@
           <span class="expand">Logs (last 100 lines)</span>
           <x-buttons>
             <x-button
-              @click.prevent="$emit('showLog')"
+              @click.prevent="$emit('openLog')"
               class="btn btn-flat btn-small"
             >
-              <x-label>Show Log File</x-label>
+              <x-label>Open Log File</x-label>
+            </x-button>
+            <x-button
+              class="btn btn-flat btn-small"
+              menu
+            >
+              <i class="material-icons">arrow_drop_down</i>
+              <x-menu>
+                <x-menuitem @click.prevent="() => $emit('openLog')">
+                  <x-label>Open Log File</x-label>
+                </x-menuitem>
+                <x-menuitem @click.prevent="() => $emit('showLog')">
+                  <x-label>Show In Folder</x-label>
+                </x-menuitem>
+              </x-menu>
             </x-button>
           </x-buttons>
         </h3>

@@ -38,7 +38,7 @@ export async function addUserSetting(
   key: string,
   options: AddUserSettingOptions
 ): Promise<void> {
-  const {
+  let {
     defaultValue,
     valueType,
     userValue = null,

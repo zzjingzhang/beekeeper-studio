@@ -57,21 +57,7 @@ export function newState(id: string): void {
   states.set(id, new State());
 }
 
-export async function removeState(id: string): Promise<void> {
-  const state = states.get(id);
-  if (!state) return;
-  for (const file of state.tempFiles.values()) {
-    if (file.fileHandle) {
-      await file.fileHandle.close().catch();
-    }
-
-    if (file.fileObject) {
-      try {
-        file.fileObject.removeCallback()
-      } catch {}
-    }
-  }
-  state.tempFiles.clear();
+export function removeState(id: string): void {
   states.delete(id);
 }
 

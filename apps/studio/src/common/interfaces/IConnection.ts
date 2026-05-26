@@ -1,4 +1,4 @@
-import { AzureAuthOptions, BigQueryOptions, CassandraOptions, DynamoDBOptions, LibSQLOptions, RedshiftOptions, ConnectionType, SQLAnywhereOptions, IamAuthOptions, SurrealDBOptions } from "@/lib/db/types"
+import { AzureAuthOptions, BigQueryOptions, CassandraOptions, LibSQLOptions, RedshiftOptions, ConnectionType, SQLAnywhereOptions, IamAuthOptions, SurrealDBOptions } from "@/lib/db/types"
 import { Transport } from "../transport"
 
 export type SshMode = null | 'agent' | 'userpass' | 'keyfile'
@@ -14,8 +14,7 @@ export function isUltimateType(s: ConnectionType) {
     'mongodb',
     'sqlanywhere',
     'trino',
-    'surrealdb',
-    'dynamodb'
+    'surrealdb'
   ]
   return types.includes(s)
 }
@@ -63,7 +62,6 @@ export interface ISimpleConnection extends Transport {
   libsqlOptions?: LibSQLOptions
   sqlAnywhereOptions?: SQLAnywhereOptions
   surrealDbOptions?: SurrealDBOptions
-  dynamoDbOptions?: DynamoDBOptions
   connectionFolderId?: Nullable<number>
   position?: number
 }

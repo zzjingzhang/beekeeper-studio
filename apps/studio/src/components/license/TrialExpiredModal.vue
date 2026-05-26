@@ -2,9 +2,7 @@
   <portal to="modals">
     <modal class="vue-dialog beekeeper-modal" :name="modalName">
       <div class="dialog-content">
-        <div class="dialog-c-title">
-          Your trial has ended
-        </div>
+        <div class="dialog-c-title">Your trial has ended</div>
         <div>Your trial has ended</div>
       </div>
       <div class="vue-dialog-buttons">

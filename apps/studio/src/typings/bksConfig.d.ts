@@ -98,21 +98,6 @@ declare interface IBksConfig {
                 quoted: any[];
             };
         };
-        dynamodb: {
-            allowSkipToLastPage: boolean;
-            autoRollbackWarningWindow: number;
-            columnSampleSize: number;
-            cursorFetchTimeout: number;
-            manualTransactionTimeout: number;
-            maxConnections: number;
-            maxReservedConnections: number;
-            paramTypes: {
-                named: any[];
-                numbered: any[];
-                positional: boolean;
-                quoted: any[];
-            };
-        };
         firebird: {
             allowSkipToLastPage: boolean;
             autoRollbackWarningWindow: number;
@@ -433,9 +418,6 @@ declare interface IBksConfig {
         };
     };
     security: {
-        activityEvents: string[];
-        activityReportIntervalSeconds: number;
-        allowRuntimeExtensions: boolean;
         disconnectOnIdle: boolean;
         disconnectOnLock: boolean;
         disconnectOnSuspend: boolean;
@@ -477,5 +459,5 @@ declare interface IBksConfig {
             maxColumnWidth: number;
         };
     };
-}
+};
 

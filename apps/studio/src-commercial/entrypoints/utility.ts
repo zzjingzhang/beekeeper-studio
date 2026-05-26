@@ -130,7 +130,7 @@ process.parentPort.on('message', async ({ data, ports }) => {
     case 'close':
       log.info('REMOVING STATE FOR: ', sId);
       state(sId).port.close();
-      await removeState(sId);
+      removeState(sId);
       break;
     default:
       log.error('UNRECOGNIZED MESSAGE TYPE RECEIVED FROM MAIN PROCESS');

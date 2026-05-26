@@ -11,9 +11,9 @@
   </div>
   <div
     v-else-if="isCommunity"
-    class="upgrade-panel-tab-wrapper"
+    class="tab-upsell-wrapper"
   >
-    <upgrade-panel feature-name="Import From File" standalone />
+    <upsell-content />
   </div>
   <div v-else class="tab-content">
     <div class="import-table-container">
@@ -116,7 +116,7 @@
   import ImportTable from './importtable/ImportTable.vue'
   import ImportMapper from './importtable/ImportMapper.vue'
   import ImportPreview from './importtable/ImportPreview.vue'
-  import UpgradePanel from '@/components/upsell/UpgradePanel.vue'
+  import UpsellContent from '@/components/upsell/UpsellContent.vue'
   import { DialectTitles } from '@shared/lib/dialects/models'
 
   import { ExportStatus } from '../lib/export/models'
@@ -126,7 +126,7 @@
     components: {
       Stepper,
       StatusBar,
-      UpgradePanel
+      UpsellContent
     },
     props: {
       schema: {

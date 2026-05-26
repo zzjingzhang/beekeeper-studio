@@ -14,9 +14,7 @@
             <p>
               Beekeeper Studio will download
               <strong>{{ depName }}</strong>
-              <template v-if="version">
-                v{{ version }}
-              </template>
+              <template v-if="version"> v{{ version }}</template>
               and install it for use as a database driver dependency.
             </p>
 

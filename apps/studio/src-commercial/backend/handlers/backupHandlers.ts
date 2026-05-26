@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import { state } from "@/handlers/handlerState";
 import platformInfo from "@/common/platform_info";
 
-export const errorMessages = {
+const errorMessages = {
   nonZero: 'Command returned non-zero exit code'
 }
 
@@ -17,9 +17,8 @@ export const BackupHandlers: IBackupHandlers = {
   'backup/runCommand': async function({ command, sId }: { command: Command, sId: string }) {
     if (command.isSql) {
       // Execute SQL command on connection
-      const sqlQuery = await state(sId).connection.query(`${command.mainCommand} ${command.options ? command.options.join(' ') : ''}`, null);
-      return new Promise<void>((resolve, reject) => {
-        sqlQuery.execute()
+      return new Promise<void>(async (resolve, reject) => {
+        (await state(sId).connection.query(`${command.mainCommand} ${command.options ? command.options.join(' ') : ''}`, null)).execute()
           .catch((reason) => {
             state(sId).port.postMessage({
               type: 'backupNotif',
@@ -42,7 +41,7 @@ export const BackupHandlers: IBackupHandlers = {
       })
     } else {
       state(sId).backupProc = spawn(command.mainCommand, command.options, {
-        shell: false,
+        shell: true,
         env: command.env
       });
 
@@ -101,7 +100,7 @@ export const BackupHandlers: IBackupHandlers = {
     const command = platformInfo.isWindows ? 'where' : 'which';
 
     return new Promise((resolve, reject) => {
-      const proc = spawn(command, [toolName], { shell: false });
+      const proc = spawn(command, [toolName], { shell: true });
 
       let stdout = '';
       let stderr = '';

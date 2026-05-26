@@ -9,9 +9,7 @@
         <template v-if="plugin.author.name && plugin.author.url">
           <a :href="plugin.author.url">{{ plugin.author.name }}</a>
         </template>
-        <template v-else>
-          {{ plugin.author }}
-        </template>
+        <template v-else>{{ plugin.author }}</template>
         <i
           class="material-icons verified-icon"
           v-if="plugin.origin === 'official'"
@@ -34,11 +32,9 @@
             @click.prevent="$emit('update')"
             class="btn btn-primary"
           >
-            <x-label>
-              {{
-                plugin.installing ? "Updating..." : "Update"
-              }}
-            </x-label>
+            <x-label>{{
+              plugin.installing ? "Updating..." : "Update"
+            }}</x-label>
           </x-button>
           <x-button
             v-else
@@ -56,7 +52,7 @@
               type="checkbox"
               :checked="autoUpdateEnabled"
               @change="toggleAutoUpdate"
-            >
+            />
             <span>Auto-update</span>
           </label>
         </template>
@@ -66,11 +62,9 @@
           class="btn btn-primary"
           :disabled="plugin.installing"
         >
-          <x-label>
-            {{
-              plugin.installing ? "Installing..." : "Install"
-            }}
-          </x-label>
+          <x-label>{{
+            plugin.installing ? "Installing..." : "Install"
+          }}</x-label>
         </x-button>
       </div>
       <div
@@ -81,7 +75,7 @@
       >
         {{ plugin.updateAvailable ? "Update Available!" : "Up to date!" }}
       </div>
-      <DisableStateAlert :plugin-id="plugin.id" />
+      <DisableStateAlert :pluginId="plugin.id" />
       <div class="alert alert-danger" v-if="!plugin.loadable && plugin.installed">
         <i class="material-icons">error_outline</i>
         <div class="alert-body expand">
@@ -101,9 +95,7 @@
     </div>
     <div class="divider" v-if="rawHtmlContent" />
     <div class="markdown-content">
-      <div v-if="loadingMarkdown" class="loading">
-        Loading plugin readme
-      </div>
+      <div v-if="loadingMarkdown" class="loading">Loading plugin readme</div>
       <div v-html="rawHtmlContent" />
     </div>
   </div>
